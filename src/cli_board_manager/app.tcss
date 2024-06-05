@@ -1,0 +1,7 @@
+ClipItem {
+    margin: 1 0;
+    padding: 1 2;
+    & Label {
+        width: 100%;
+    }
+}
