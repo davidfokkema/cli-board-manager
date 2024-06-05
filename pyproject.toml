@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "cli-board-manager"
+version = "0.1.0"
+description = ""
+authors = ["David Fokkema <davidfokkema@icloud.com>"]
+readme = "README.md"
+packages = [{include = "cli_board_manager", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
