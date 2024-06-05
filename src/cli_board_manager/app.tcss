@@ -9,4 +9,14 @@ ClipItem {
     &.current {
         border: hkey $secondary;
     }
+
+    & Horizontal {
+        margin-top: 1;
+        height: 3;
+    }
+
+    & #delete {
+        dock: right;
+    }
+
 }
