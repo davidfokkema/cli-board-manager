@@ -1,7 +1,12 @@
 ClipItem {
     margin: 1 0;
-    padding: 1 2;
+    padding: 0 2;
+    border: blank;
     & Label {
         width: 100%;
+    }
+
+    &.current {
+        border: hkey $secondary;
     }
 }
