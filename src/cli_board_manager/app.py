@@ -43,7 +43,7 @@ class ClipBoard(ListView):
         if self.current_item:
             self.current_item.remove_class("current")
         item.add_class("current")
-        # self.parent.scroll_visible(item)
+        item.scroll_visible()
         self.current_item = item
 
     def action_clear(self) -> None:
