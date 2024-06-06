@@ -1,6 +1,6 @@
 import pyperclip
 from textual.app import App, ComposeResult, on
-from textual.containers import Horizontal, VerticalScroll
+from textual.containers import Horizontal
 from textual.widgets import (
     Button,
     Footer,
@@ -88,11 +88,9 @@ class CliBoardManagerApp(App[None]):
         yield Footer()
         with TabbedContent():
             with TabPane("History", id="tab_history"):
-                with VerticalScroll():
-                    yield ClipBoard(id="clipboard_history")
+                yield ClipBoard(id="clipboard_history")
             with TabPane("Workflow", id="tab_workflow"):
-                with VerticalScroll():
-                    yield WorkFlow(id="workflow")
+                yield WorkFlow(id="workflow")
 
     @on(Button.Pressed, "#add_workflow")
     def add_to_workflow(self, event: Button.Pressed) -> None:
