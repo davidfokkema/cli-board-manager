@@ -1,6 +1,7 @@
 import pyperclip
 from textual.app import App, ComposeResult, on
 from textual.containers import Horizontal
+from textual.events import Event
 from textual.widgets import (
     Button,
     Footer,
@@ -15,6 +16,12 @@ from textual.widgets import (
 
 
 class ClipItem(ListItem):
+
+    class Deleted(Event):
+        def __init__(self, item: "ClipItem", *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            self.item = item
+
     def __init__(
         self, contents: str, is_workflow: bool = False, *args, **kwargs
     ) -> None:
@@ -31,7 +38,7 @@ class ClipItem(ListItem):
 
     @on(Button.Pressed, "#delete")
     def remove_item(self, event: Button.Pressed) -> None:
-        self.remove()
+        self.post_message(self.Deleted(item=self))
 
 
 class ClipBoardView(ListView):
@@ -46,12 +53,15 @@ class ClipBoardView(ListView):
             return ""
 
     @on(ListView.Selected)
-    def copy_contents(self, event: ListView.Selected) -> None:
-        self.set_current_item(event.item)
+    def copy_selected_contents(self, event: ListView.Selected) -> None:
+        self.copy_contents(event.item)
+
+    def copy_contents(self, item: ClipItem) -> None:
+        self.set_current_item(item)
         pyperclip.copy(self.current_item.contents)
         self.notify("Copied contents to clipboard.")
 
-    def set_current_item(self, item):
+    def set_current_item(self, item: ClipItem) -> None:
         if self.current_item:
             self.current_item.remove_class("current")
         item.add_class("current")
@@ -60,6 +70,24 @@ class ClipBoardView(ListView):
 
     def action_clear(self) -> None:
         self.clear()
+
+    @on(ClipItem.Deleted)
+    def delete_item(self, event: ClipItem.Deleted) -> None:
+        if event.item == self.current_item:
+            idx = self.children.index(event.item)
+            try:
+                new_current_item = self.children[idx + 1]
+            except IndexError:
+                if idx > 0:
+                    new_current_item = self.children[idx - 1]
+                else:
+                    new_current_item = None
+            if new_current_item is not None:
+                self.copy_contents(new_current_item)
+            else:
+                self.current_item = None
+                pyperclip.copy("")
+        event.item.remove()
 
 
 class ClipBoard(ClipBoardView):
