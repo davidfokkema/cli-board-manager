@@ -69,6 +69,7 @@ class ClipBoardView(ListView):
         self.current_item = item
 
     def action_clear(self) -> None:
+        self.clear_clipboard()
         self.clear()
 
     @on(ClipItem.Deleted)
@@ -85,9 +86,12 @@ class ClipBoardView(ListView):
             if new_current_item is not None:
                 self.copy_contents(new_current_item)
             else:
-                self.current_item = None
-                pyperclip.copy("")
+                self.clear_clipboard()
         event.item.remove()
+
+    def clear_clipboard(self):
+        self.current_item = None
+        pyperclip.copy("")
 
 
 class ClipBoard(ClipBoardView):
