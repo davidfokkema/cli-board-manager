@@ -143,7 +143,9 @@ class ClipBoardHistory(ClipBoardView):
         ):
             self.append(item := ClipBoardHistoryItem(contents=contents))
             self.set_current_item(item)
-            self.post_message(ClipBoardHistory.Selected(list_view=self, item=item))
+            self.parent.post_message(
+                ClipBoardHistory.Selected(list_view=self, item=item)
+            )
 
 
 class CliBoardManagerApp(App[None]):
