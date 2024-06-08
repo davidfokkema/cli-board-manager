@@ -211,5 +211,9 @@ class CliBoardManagerApp(App[None]):
         self.exit()
 
 
-if __name__ == "__main__":
+def main():
     CliBoardManagerApp().run()
+
+
+if __name__ == "__main__":
+    main()

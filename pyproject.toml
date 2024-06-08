@@ -4,16 +4,18 @@ version = "0.1.0"
 description = ""
 authors = ["David Fokkema <davidfokkema@icloud.com>"]
 readme = "README.md"
-packages = [{include = "cli_board_manager", from = "src"}]
+packages = [{ include = "cli_board_manager", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 textual = "^0.64.0"
 pyperclip = "^1.8.2"
 
-
 [tool.poetry.group.dev.dependencies]
 textual-dev = "^1.5.1"
+
+[tool.poetry.scripts]
+cbm = "cli_board_manager.app:main"
 
 [build-system]
 requires = ["poetry-core"]
