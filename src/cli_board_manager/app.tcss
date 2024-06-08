@@ -1,4 +1,4 @@
-ClipItem, WorkflowItem {
+ClipBoardHistoryItem, WorkflowItem {
     margin: 1 0;
     padding: 0 2;
     border: blank;
