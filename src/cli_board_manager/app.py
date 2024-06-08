@@ -128,9 +128,9 @@ class ClipBoardHistory(ClipBoardView):
             contents != self.current_contents()
             and contents != self.workflow.current_contents()
         ):
-            print(f"Added value from clipboard, {self=}")
             self.append(item := ClipBoardHistoryItem(contents=contents))
             self.set_current_item(item)
+            self.post_message(ClipBoardHistory.Selected(list_view=self, item=item))
 
 
 class CliBoardManagerApp(App[None]):
