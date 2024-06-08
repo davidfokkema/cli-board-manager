@@ -110,20 +110,27 @@ class ClipBoardView(ListView):
         pyperclip.copy("")
 
 
+class WorkFlow(ClipBoardView): ...
+
+
 class ClipBoardHistory(ClipBoardView):
+
+    def __init__(self, workflow: WorkFlow, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.workflow = workflow
 
     def on_mount(self) -> None:
         self.set_interval(0.2, self.watch_clipboard)
 
     def watch_clipboard(self) -> None:
         contents = pyperclip.paste()
-        if contents != self.current_contents():
+        if (
+            contents != self.current_contents()
+            and contents != self.workflow.current_contents()
+        ):
             print(f"Added value from clipboard, {self=}")
             self.append(item := ClipBoardHistoryItem(contents=contents))
             self.set_current_item(item)
-
-
-class WorkFlow(ClipBoardView): ...
 
 
 class CliBoardManagerApp(App[None]):
@@ -135,14 +142,23 @@ class CliBoardManagerApp(App[None]):
         yield Header()
         yield Footer()
         with TabbedContent():
+            workflow = WorkFlow(id="workflow")
             with TabPane("History", id="tab_history"):
-                yield ClipBoardHistory(id="clipboard_history")
+                yield ClipBoardHistory(workflow=workflow, id="clipboard_history")
             with TabPane("Workflow", id="tab_workflow"):
-                yield WorkFlow(id="workflow")
+                yield workflow
 
     @on(ClipBoardHistoryItem.AppendToWorkflow)
     def append_to_workflow(self, event: ClipBoardHistoryItem.AppendToWorkflow) -> None:
         self.query_one("#workflow").append(WorkflowItem(event.contents))
+
+    @on(ListView.Selected, "#clipboard_history")
+    def history_item_selected(self, event):
+        self.query_one("#workflow").set_current_item(None)
+
+    @on(ListView.Selected, "#workflow")
+    def workflow_item_selected(self, event):
+        self.query_one("#clipboard_history").set_current_item(None)
 
     def action_quit(self):
         self.exit()
