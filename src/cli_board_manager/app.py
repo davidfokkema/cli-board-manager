@@ -141,7 +141,7 @@ class CliBoardManagerApp(App[None]):
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
-        with TabbedContent():
+        with TabbedContent(id="tabs"):
             workflow = WorkFlow(id="workflow")
             with TabPane("History", id="tab_history"):
                 yield ClipBoardHistory(workflow=workflow, id="clipboard_history")
@@ -166,6 +166,18 @@ class CliBoardManagerApp(App[None]):
     @on(ListView.Selected, "#workflow")
     def workflow_item_selected(self, event):
         self.query_one("#clipboard_history").set_current_item(None)
+
+    @on(Button.Pressed, "#start_workflow")
+    def start_workflow(self, event: Button.Pressed) -> None:
+        self.query_one("#tabs").disable_tab("tab_history")
+        self.query_one("#start_workflow").disabled = True
+        self.query_one("#stop_workflow").disabled = False
+
+    @on(Button.Pressed, "#stop_workflow")
+    def stop_workflow(self, event: Button.Pressed) -> None:
+        self.query_one("#tabs").enable_tab("tab_history")
+        self.query_one("#start_workflow").disabled = False
+        self.query_one("#stop_workflow").disabled = True
 
     def action_quit(self):
         self.exit()
