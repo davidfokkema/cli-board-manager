@@ -20,3 +20,11 @@ ClipBoardHistoryItem, WorkflowItem {
     }
 
 }
+
+#workflow_buttons {
+    height: auto;
+}
+
+#start_workflow {
+    margin-right: 1;
+}

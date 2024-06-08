@@ -147,6 +147,13 @@ class CliBoardManagerApp(App[None]):
                 yield ClipBoardHistory(workflow=workflow, id="clipboard_history")
             with TabPane("Workflow", id="tab_workflow"):
                 yield workflow
+                with Horizontal(id="workflow_buttons"):
+                    yield Button(
+                        "Start workflow", id="start_workflow", variant="success"
+                    )
+                    yield Button(
+                        "Stop", id="stop_workflow", variant="error", disabled=True
+                    )
 
     @on(ClipBoardHistoryItem.AppendToWorkflow)
     def append_to_workflow(self, event: ClipBoardHistoryItem.AppendToWorkflow) -> None:
