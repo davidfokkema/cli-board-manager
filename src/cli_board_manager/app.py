@@ -15,10 +15,10 @@ from textual.widgets import (
 )
 
 
-class ClipItem(ListItem):
+class WorkflowItem(ListItem):
 
     class Deleted(Event):
-        def __init__(self, item: "ClipItem", *args, **kwargs) -> None:
+        def __init__(self, item: "WorkflowItem", *args, **kwargs) -> None:
             super().__init__(*args, **kwargs)
             self.item = item
 
@@ -41,10 +41,85 @@ class ClipItem(ListItem):
         self.post_message(self.Deleted(item=self))
 
 
-class ClipBoardView(ListView):
+class WorkFlow(ListView):
+    BINDINGS = [("c", "clear", "Clear")]
+
+    current_item: WorkflowItem | None = None
+
+    @on(ListView.Selected)
+    def copy_selected_contents(self, event: ListView.Selected) -> None:
+        self.copy_contents(event.item)
+
+    def copy_contents(self, item: WorkflowItem) -> None:
+        self.set_current_item(item)
+        pyperclip.copy(self.current_item.contents)
+        self.notify("Copied contents to clipboard.")
+
+    def set_current_item(self, item: WorkflowItem) -> None:
+        if self.current_item:
+            self.current_item.remove_class("current")
+        item.add_class("current")
+        item.scroll_visible()
+        self.current_item = item
+
+    def action_clear(self) -> None:
+        self.clear_clipboard()
+        self.clear()
+
+    @on(WorkflowItem.Deleted)
+    def delete_item(self, event: WorkflowItem.Deleted) -> None:
+        event.item.remove()
+
+    def clear_clipboard(self):
+        self.current_item = None
+        pyperclip.copy("")
+
+
+class ClipItem(ListItem):
+
+    class Deleted(Event):
+        def __init__(self, item: "ClipItem") -> None:
+            super().__init__()
+            self.item = item
+
+    class AppendToWorkflow(Event):
+        def __init__(self, contents: str) -> None:
+            super().__init__()
+            self.contents = contents
+
+    def __init__(self, contents: str, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.contents = contents
+
+    def compose(self) -> ComposeResult:
+        yield Label(self.contents)
+        with Horizontal():
+            yield Button("Add to workflow", id="append_workflow")
+            yield Button("Delete", id="delete", variant="error")
+
+    @on(Button.Pressed, "#delete")
+    def remove_item(self, event: Button.Pressed) -> None:
+        self.post_message(self.Deleted(item=self))
+
+    @on(Button.Pressed, "#append_workflow")
+    def append_to_workflow(self, event: Button.Pressed) -> None:
+        self.post_message(self.AppendToWorkflow(contents=self.contents))
+
+
+class ClipBoard(ListView):
     BINDINGS = [("c", "clear", "Clear")]
 
     current_item: ClipItem | None = None
+
+    def on_mount(self) -> None:
+        self.set_interval(0.2, self.watch_clipboard)
+
+    def watch_clipboard(self) -> None:
+        contents = pyperclip.paste()
+        if contents != self.current_contents():
+            print(f"Added value from clipboard, {self=}")
+            self.append(item := ClipItem(contents=contents))
+            self.set_current_item(item)
 
     def current_contents(self) -> str:
         if self.current_item:
@@ -94,22 +169,6 @@ class ClipBoardView(ListView):
         pyperclip.copy("")
 
 
-class ClipBoard(ClipBoardView):
-    def on_mount(self) -> None:
-        print(f"Yo, I'm {self=}")
-        self.set_interval(0.2, self.watch_clipboard)
-
-    def watch_clipboard(self) -> None:
-        contents = pyperclip.paste()
-        if contents != self.current_contents():
-            print(f"Added value from clipboard, {self=}")
-            self.append(item := ClipItem(contents=contents))
-            self.set_current_item(item)
-
-
-class WorkFlow(ClipBoardView): ...
-
-
 class CliBoardManagerApp(App[None]):
     CSS_PATH = "app.tcss"
 
@@ -124,10 +183,11 @@ class CliBoardManagerApp(App[None]):
             with TabPane("Workflow", id="tab_workflow"):
                 yield WorkFlow(id="workflow")
 
-    @on(Button.Pressed, "#add_workflow")
-    def add_to_workflow(self, event: Button.Pressed) -> None:
-        print(f"{event.button.parent.parent=}")
-        self.query_one("#workflow").append(ClipItem("Star", is_workflow=True))
+    @on(ClipItem.AppendToWorkflow)
+    def append_to_workflow(self, event: ClipItem.AppendToWorkflow) -> None:
+        self.query_one("#workflow").append(
+            WorkflowItem(event.contents, is_workflow=True)
+        )
 
     def action_quit(self):
         self.exit()
