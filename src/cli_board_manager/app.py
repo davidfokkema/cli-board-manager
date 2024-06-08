@@ -1,7 +1,8 @@
 import pyperclip
 from textual.app import App, ComposeResult, on
 from textual.containers import Horizontal
-from textual.events import Event
+from textual.events import AppFocus, Event
+from textual.timer import Timer
 from textual.widgets import (
     Button,
     Footer,
@@ -110,17 +111,29 @@ class ClipBoardView(ListView):
         pyperclip.copy("")
 
 
-class WorkFlow(ClipBoardView): ...
+class WorkFlow(ClipBoardView):
+    def start_workflow(self) -> None:
+        self.post_message(ListView.Selected(list_view=self, item=self.children[0]))
+
+    def next_workflow_step(self) -> None:
+        idx = self.children.index(self.current_item)
+        try:
+            self.copy_contents(self.children[idx + 1])
+        except IndexError:
+            self.copy_contents(self.children[0])
 
 
 class ClipBoardHistory(ClipBoardView):
+
+    timer: Timer
+    workflow: WorkFlow
 
     def __init__(self, workflow: WorkFlow, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.workflow = workflow
 
     def on_mount(self) -> None:
-        self.set_interval(0.2, self.watch_clipboard)
+        self.timer = self.set_interval(0.2, self.watch_clipboard)
 
     def watch_clipboard(self) -> None:
         contents = pyperclip.paste()
@@ -138,15 +151,20 @@ class CliBoardManagerApp(App[None]):
 
     BINDINGS = [("q", "quit", "Quit")]
 
+    workflow_is_running = False
+
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
         with TabbedContent(id="tabs"):
-            workflow = WorkFlow(id="workflow")
+            self.workflow = WorkFlow(id="workflow")
+            self.history = ClipBoardHistory(
+                workflow=self.workflow, id="clipboard_history"
+            )
             with TabPane("History", id="tab_history"):
-                yield ClipBoardHistory(workflow=workflow, id="clipboard_history")
+                yield self.history
             with TabPane("Workflow", id="tab_workflow"):
-                yield workflow
+                yield self.workflow
                 with Horizontal(id="workflow_buttons"):
                     yield Button(
                         "Start workflow", id="start_workflow", variant="success"
@@ -157,27 +175,37 @@ class CliBoardManagerApp(App[None]):
 
     @on(ClipBoardHistoryItem.AppendToWorkflow)
     def append_to_workflow(self, event: ClipBoardHistoryItem.AppendToWorkflow) -> None:
-        self.query_one("#workflow").append(WorkflowItem(event.contents))
+        self.workflow.append(WorkflowItem(event.contents))
 
     @on(ListView.Selected, "#clipboard_history")
     def history_item_selected(self, event):
-        self.query_one("#workflow").set_current_item(None)
+        self.workflow.set_current_item(None)
 
     @on(ListView.Selected, "#workflow")
     def workflow_item_selected(self, event):
         self.query_one("#clipboard_history").set_current_item(None)
 
     @on(Button.Pressed, "#start_workflow")
-    def start_workflow(self, event: Button.Pressed) -> None:
+    def start_workflow(self) -> None:
         self.query_one("#tabs").disable_tab("tab_history")
         self.query_one("#start_workflow").disabled = True
         self.query_one("#stop_workflow").disabled = False
+        self.workflow.start_workflow()
+        self.history.timer.pause()
+        self.workflow_is_running = True
 
     @on(Button.Pressed, "#stop_workflow")
-    def stop_workflow(self, event: Button.Pressed) -> None:
+    def stop_workflow(self) -> None:
         self.query_one("#tabs").enable_tab("tab_history")
         self.query_one("#start_workflow").disabled = False
         self.query_one("#stop_workflow").disabled = True
+        self.workflow_is_running = False
+        self.history.timer.resume()
+
+    @on(AppFocus)
+    def next_workflow_step(self) -> None:
+        if self.workflow_is_running:
+            self.workflow.next_workflow_step()
 
     def action_quit(self):
         self.exit()
