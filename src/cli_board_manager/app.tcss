@@ -1,3 +1,24 @@
+EditScreen {
+    align: center middle;
+
+    & Vertical {
+        border: round $secondary;
+        background: $surface;
+        width: 90%;
+        height: 90%;
+
+        & TextArea {
+            height: 1fr;
+        }
+            
+        & #buttons {
+            height: auto;
+            margin-left: 1;
+        }
+    }
+}
+        
+
 ClipBoardHistoryItem, WorkflowItem {
     margin: 1 0;
     padding: 0 2;
@@ -18,13 +39,12 @@ ClipBoardHistoryItem, WorkflowItem {
     & #delete {
         dock: right;
     }
-
 }
 
 #workflow_buttons {
     height: auto;
 }
 
-#start_workflow {
-    margin-right: 1;
+#append_workflow, #start_workflow, #done {
+    margin-right: 2;
 }

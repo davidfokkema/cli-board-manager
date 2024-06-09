@@ -1,7 +1,9 @@
 import pyperclip
 from textual.app import App, ComposeResult, on
-from textual.containers import Horizontal
+from textual.containers import Horizontal, Vertical
 from textual.events import AppFocus, Event
+from textual.reactive import reactive
+from textual.screen import ModalScreen
 from textual.timer import Timer
 from textual.widgets import (
     Button,
@@ -16,24 +18,60 @@ from textual.widgets import (
 )
 
 
+class EditScreen(ModalScreen):
+    def __init__(self, contents: str, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.contents = contents
+
+    def compose(self) -> ComposeResult:
+        with Vertical():
+            yield TextArea(text=self.contents, show_line_numbers=1)
+            with Horizontal(id="buttons"):
+                yield Button("Done", id="done", variant="primary")
+                yield Button("Cancel", id="cancel", variant="error")
+
+    @on(Button.Pressed, "#done")
+    def finish(self) -> None:
+        self.dismiss(self.query_one(TextArea).text)
+
+    @on(Button.Pressed, "#cancel")
+    def cancel(self) -> None:
+        self.dismiss(False)
+
+
 class ClipBoardItem(ListItem):
     class Deleted(Event):
         def __init__(self, item: "ClipBoardItem") -> None:
             super().__init__()
             self.item = item
 
+    contents = reactive("", recompose=True)
+
     def __init__(self, contents: str, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.contents = contents
 
     def compose(self) -> ComposeResult:
-        yield Label(self.contents)
+        yield Label(self.contents, id="contents")
         with Horizontal():
+            yield Button("Edit", id="edit", variant="primary")
             yield Button("Delete", id="delete", variant="error")
 
     @on(Button.Pressed, "#delete")
-    def remove_item(self, event: Button.Pressed) -> None:
+    def remove_item(self) -> None:
         self.post_message(self.Deleted(item=self))
+
+    @on(Button.Pressed, "#edit")
+    def edit_item(self) -> None:
+        self.app.push_screen(EditScreen(self.contents), callback=self.replace_contents)
+
+    def replace_contents(self, contents: bool | str) -> None:
+        if contents is not False:
+            self.contents = contents
+
+    def watch_contents(self, old_contents: str, new_contents: str) -> None:
+        if self.has_class("current"):
+            pyperclip.copy(new_contents)
 
 
 class ClipBoardHistoryItem(ClipBoardItem):
@@ -47,6 +85,7 @@ class ClipBoardHistoryItem(ClipBoardItem):
         yield Label(self.contents)
         with Horizontal():
             yield Button("Add to workflow", id="append_workflow")
+            yield Button("Edit", id="edit", variant="primary")
             yield Button("Delete", id="delete", variant="error")
 
     @on(Button.Pressed, "#append_workflow")
