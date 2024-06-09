@@ -195,7 +195,7 @@ class CliBoardManagerApp(App[None]):
     workflow_is_running = False
 
     def compose(self) -> ComposeResult:
-        yield Header()
+        yield Header(icon="📋")
         yield Footer()
         with TabbedContent(id="tabs"):
             self.workflow = WorkFlow(id="workflow")
