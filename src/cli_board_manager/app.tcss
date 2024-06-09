@@ -43,6 +43,7 @@ ClipBoardHistoryItem, WorkflowItem {
 
 #workflow_buttons {
     height: auto;
+    margin-top: 1;
 }
 
 #append_workflow, #start_workflow, #done {
