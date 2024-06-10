@@ -8,7 +8,7 @@ CLI-board-manager is a clipboard manager for the terminal written in Python with
 
 CLI-board-manager keeps track of all items you place on the clipboard using the normal copy action. If you accidentally copy sensitive information, press the Delete button for that item to remove it from the interface _and_ the clipboard.
 
-![Screenshot showing the clipboard history](images/screenshot-history.png)
+![Screenshot showing the clipboard history](https://github.com/davidfokkema/cli-board-manager/raw/main/images/screenshot-history.png)
 
 ### Create copy/paste workflows
 
@@ -16,7 +16,7 @@ Filling out a series of web forms or sending messages with a subject field and a
 
 If you make a mistake and need to move to another item in the workflow, just select that item and the workflow will continue there.
 
-![Screenshot showing the clipboard history](images/screenshot-workflow.png)
+![Screenshot showing the clipboard history](https://github.com/davidfokkema/cli-board-manager/raw/main/images/screenshot-workflow.png)
 
 ## Usage
 
