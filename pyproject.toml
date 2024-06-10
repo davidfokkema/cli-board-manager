@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cli-board-manager"
-version = "0.1.0.post1"
+version = "1.0.0"
 homepage = "https://github.com/davidfokkema/cli-board-manager"
 description = "A clipboard manager for the terminal written in Python with the ✨awesome✨ Textual framework."
 authors = ["David Fokkema <davidfokkema@icloud.com>"]
