@@ -1,10 +1,22 @@
 [tool.poetry]
 name = "cli-board-manager"
-version = "0.1.0"
-description = ""
+version = "0.1.0.post1"
+homepage = "https://github.com/davidfokkema/cli-board-manager"
+description = "A clipboard manager for the terminal written in Python with the ✨awesome✨ Textual framework."
 authors = ["David Fokkema <davidfokkema@icloud.com>"]
 readme = "README.md"
 packages = [{ include = "cli_board_manager", from = "src" }]
+license = "GPL-3.0-or-later"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Programming Language :: Python",
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
