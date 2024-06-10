@@ -16,6 +16,8 @@ Filling out a series of web forms or sending messages with a subject field and a
 
 If you make a mistake and need to move to another item in the workflow, just select that item and the workflow will continue there.
 
+![Screenshot showing the clipboard history](images/screenshot-workflow.png)
+
 ## Usage
 
 Run the `cbm` command from the terminal, after installation. Use your mouse to navigate the interface or use a combination of the Tab and arrow keys along with any keyboard shortcuts indicated in the footer. Click on old items to copy them to the clipboard or press enter after selecting with the arrow keys.
