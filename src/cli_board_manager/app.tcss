@@ -28,7 +28,7 @@ ClipBoardHistoryItem, WorkflowItem {
     }
 
     &.current {
-        border: hkey $secondary;
+        border: hkey $accent;
     }
 
     & Horizontal {
