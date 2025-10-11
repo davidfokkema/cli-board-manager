@@ -24,14 +24,19 @@ Run the `cbm` command from the terminal, after installation. Use your mouse to n
 
 ## Installation
 
-This is a Python app and currently not distributed stand-alone using a nice installer. So you'll need to have Python installed and some basic knowledge about installing Python packages. [Pipx](https://pipx.pypa.io/stable/) is, in most cases, the preferred method of installation.
+This is a Python app and currently not distributed stand-alone using a nice installer. So you'll need to have Python installed and some basic knowledge about installing Python packages. [uv](https://docs.astral.sh/uv/) is, in most cases, the preferred method of installation.
 
-### Using pipx
+### Using uv / uvx
 
-Just run
+Just run (without installing)
 ```shell
-pipx install cli-board-manager
+uvx cli-board-manager
 ```
+or install with
+```shell
+uv tool install cli-board-manager
+```
+after which `cli-board-manager` and its alias `cbm` are available as commands in your terminal.
 
 ### Using pip
 
@@ -40,16 +45,16 @@ Preferably in a new virtual environment, run
 pip install cli-board-manager
 ```
 
-### From source, using Poetry
+### From source, using uv
 
 Clone the [repository](https://github.com/davidfokkema/cli-board-manager), cd into the repository's main directory and run
 ```shell
-poetry install
+uv sync
 ```
 
 ## Copyright and License
 
-Copyright (C) 2024 David Fokkema
+Copyright (C) 2024-2025 David Fokkema
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
