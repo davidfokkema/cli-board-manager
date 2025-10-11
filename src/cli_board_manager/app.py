@@ -30,8 +30,8 @@ class EditScreen(ModalScreen[str | bool]):
         with Vertical():
             yield TextArea(text=self.contents, show_line_numbers=True)
             with Horizontal(id="buttons"):
-                yield Button("Done", id="done", variant="primary")
-                yield Button("Cancel", id="cancel", variant="error")
+                yield Button("Done", id="done", variant="primary", flat=True)
+                yield Button("Cancel", id="cancel", variant="error", flat=True)
 
     @on(Button.Pressed, "#done")
     def finish(self) -> None:
@@ -87,9 +87,9 @@ class ClipBoardHistoryItem(ClipBoardItem):
     def compose(self) -> ComposeResult:
         yield Label(self.contents)
         with Horizontal():
-            yield Button("Add to workflow", id="append_workflow")
-            yield Button("Edit", id="edit", variant="primary")
-            yield Button("Delete", id="delete", variant="error")
+            yield Button("Add to workflow", id="append_workflow", flat=True)
+            yield Button("Edit", id="edit", variant="primary", flat=True)
+            yield Button("Delete", id="delete", variant="error", flat=True)
 
     @on(Button.Pressed, "#append_workflow")
     def append_to_workflow(self, event: Button.Pressed) -> None:
@@ -221,10 +221,17 @@ class CliBoardManagerApp(App[None]):
                 yield self.workflow
                 with Horizontal(id="workflow_buttons"):
                     yield Button(
-                        "Start workflow", id="start_workflow", variant="success"
+                        "Start workflow",
+                        id="start_workflow",
+                        variant="success",
+                        flat=True,
                     )
                     yield Button(
-                        "Stop", id="stop_workflow", variant="error", disabled=True
+                        "Stop",
+                        id="stop_workflow",
+                        variant="error",
+                        disabled=True,
+                        flat=True,
                     )
 
     @on(ClipBoardHistoryItem.AppendToWorkflow)
