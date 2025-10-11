@@ -75,7 +75,6 @@ class ClipBoardItem(ListItem):
 
 
 class ClipBoardHistoryItem(ClipBoardItem):
-
     class AppendToWorkflow(Event):
         def __init__(self, contents: str) -> None:
             super().__init__()
@@ -130,6 +129,7 @@ class ClipBoardView(ListView):
 
     def copy_contents(self, item: ClipBoardItem) -> None:
         self.set_current_item(item)
+        assert self.current_item is not None
         pyperclip.copy(self.current_item.contents)
         self.notify("Copied contents to clipboard.")
 
@@ -163,7 +163,6 @@ class WorkFlow(ClipBoardView):
 
 
 class ClipBoardHistory(ClipBoardView):
-
     timer: Timer
     workflow: WorkFlow
 
