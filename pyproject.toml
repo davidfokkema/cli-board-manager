@@ -20,7 +20,7 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
     "pyperclip>=1.11.0",
-    "textual==0.66.0",
+    "textual>=6.3.0",
 ]
 
 [project.urls]

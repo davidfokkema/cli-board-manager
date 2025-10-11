@@ -25,7 +25,7 @@ class EditScreen(ModalScreen):
 
     def compose(self) -> ComposeResult:
         with Vertical():
-            yield TextArea(text=self.contents, show_line_numbers=1)
+            yield TextArea(text=self.contents, show_line_numbers=True)
             with Horizontal(id="buttons"):
                 yield Button("Done", id="done", variant="primary")
                 yield Button("Cancel", id="cancel", variant="error")
@@ -152,7 +152,9 @@ class ClipBoardView(ListView):
 
 class WorkFlow(ClipBoardView):
     def start_workflow(self) -> None:
-        self.post_message(ListView.Selected(list_view=self, item=self.children[0]))
+        self.post_message(
+            ListView.Selected(list_view=self, item=self.children[0], index=0)
+        )
 
     def next_workflow_step(self) -> None:
         idx = self.children.index(self.current_item)
@@ -182,7 +184,9 @@ class ClipBoardHistory(ClipBoardView):
             self.append(item := ClipBoardHistoryItem(contents=contents))
             self.set_current_item(item)
             self.parent.post_message(
-                ClipBoardHistory.Selected(list_view=self, item=item)
+                ClipBoardHistory.Selected(
+                    list_view=self, item=item, index=self.children.index(item)
+                )
             )
 
 
