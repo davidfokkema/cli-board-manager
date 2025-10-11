@@ -203,7 +203,7 @@ class ClipBoardHistory(ClipBoardView):
 class CliBoardManagerApp(App[None]):
     CSS_PATH = "app.tcss"
 
-    BINDINGS = [("q", "quit", "Quit")]
+    BINDINGS = [("ctrl+q", "quit", "Quit")]
 
     workflow_is_running = False
 
