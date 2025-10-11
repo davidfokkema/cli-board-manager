@@ -1,5 +1,8 @@
+from typing import Any
+
 import pyperclip
-from textual.app import App, ComposeResult, on
+from textual import on
+from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.events import AppFocus, Event
 from textual.reactive import reactive
@@ -19,7 +22,7 @@ from textual.widgets import (
 
 
 class EditScreen(ModalScreen[str | bool]):
-    def __init__(self, contents: str, *args, **kwargs) -> None:
+    def __init__(self, contents: str, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.contents = contents
 
@@ -47,7 +50,7 @@ class ClipBoardItem(ListItem):
 
     contents = reactive("", recompose=True)
 
-    def __init__(self, contents: str, *args, **kwargs) -> None:
+    def __init__(self, contents: str, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.contents = contents
 
@@ -148,7 +151,7 @@ class ClipBoardView(ListView):
         self.clear_clipboard()
         self.clear()
 
-    def clear_clipboard(self):
+    def clear_clipboard(self) -> None:
         self.current_item = None
         pyperclip.copy("")
 
@@ -175,7 +178,7 @@ class ClipBoardHistory(ClipBoardView):
     timer: Timer
     workflow: WorkFlow
 
-    def __init__(self, workflow: WorkFlow, *args, **kwargs) -> None:
+    def __init__(self, workflow: WorkFlow, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.workflow = workflow
 
@@ -229,11 +232,11 @@ class CliBoardManagerApp(App[None]):
         self.workflow.append(WorkflowItem(event.contents))
 
     @on(ListView.Selected, "#clipboard_history")
-    def history_item_selected(self, event):
+    def history_item_selected(self) -> None:
         self.workflow.set_current_item(None)
 
     @on(ListView.Selected, "#workflow")
-    def workflow_item_selected(self, event):
+    def workflow_item_selected(self) -> None:
         self.history.set_current_item(None)
 
     @on(Button.Pressed, "#start_workflow")
@@ -258,11 +261,11 @@ class CliBoardManagerApp(App[None]):
         if self.workflow_is_running:
             self.workflow.next_workflow_step()
 
-    def action_quit(self):
+    async def action_quit(self) -> None:
         self.exit()
 
 
-def main():
+def main() -> None:
     CliBoardManagerApp().run()
 
 
